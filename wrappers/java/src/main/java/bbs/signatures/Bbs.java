@@ -207,44 +207,47 @@ public class Bbs {
         if (0 == handle) {
             throw new Exception("Unable to create signing context");
         }
-        if (0 != bbs_sign_set_secret_key(handle, secret_key)) {
-            throw new Exception("Unable to set secret key");
+        int ret;
+        if (0 != (ret = bbs_sign_set_secret_key(handle, secret_key))) {
+            throw new Exception("Unable to set secret key: " + ret + " - " + get_last_error());
         }
-        if (0 != bbs_sign_set_public_key(handle, public_key)) {
-            throw new Exception("Unable to set public key");
+        if (0 != (ret = bbs_sign_set_public_key(handle, public_key))) {
+            throw new Exception("Unable to set public key: " + ret + " - " + get_last_error());
         }
         for (byte[] msg : messages) {
-            if (0 != bbs_sign_add_message_bytes(handle, msg)) {
-                throw new Exception("Unable to add message");
+            if (0 != (ret = bbs_sign_add_message_bytes(handle, msg))) {
+                throw new Exception("Unable to add message: " + ret + " - " + get_last_error());
             }
         }
         byte[] signature = new byte[bbs_blind_signature_size()];
-        if (0 != bbs_sign_finish(handle, signature)) {
-            throw new Exception("Unable to create signature");
+        if (0 != (ret = bbs_sign_finish(handle, signature))) {
+            throw new Exception("Unable to create signature: " + ret + " - " + get_last_error());
         }
         return signature;
     }
 
     public static byte[] blsSign(byte[] secret_key, byte[] public_key, byte[][] messages) throws Exception {
         byte[] bbs_public_key = Bbs.blsPublicToBbsPublicKey(public_key, messages.length);
+        System.out.println("blsSign: " + new String(bbs_public_key));
         long handle = bbs_sign_init();
         if (0 == handle) {
             throw new Exception("Unable to create signing context");
         }
-        if (0 != bbs_sign_set_secret_key(handle, secret_key)) {
-            throw new Exception("Unable to set secret key");
+        int ret;
+        if (0 != (ret = bbs_sign_set_secret_key(handle, secret_key))) {
+            throw new Exception("Unable to set secret key: " + ret + " - " + get_last_error());
         }
-        if (0 != bbs_sign_set_public_key(handle, bbs_public_key)) {
-            throw new Exception("Unable to set public key");
+        if (0 != (ret = bbs_sign_set_public_key(handle, bbs_public_key))) {
+            throw new Exception("Unable to set public key: " + ret + " - " + get_last_error());
         }
         for (byte[] msg : messages) {
-            if (0 != bbs_sign_add_message_bytes(handle, msg)) {
-                throw new Exception("Unable to add message");
+            if (0 != (ret = bbs_sign_add_message_bytes(handle, msg))) {
+                throw new Exception("Unable to add message: " + ret + " - " + get_last_error());
             }
         }
         byte[] signature = new byte[bbs_blind_signature_size()];
-        if (0 != bbs_sign_finish(handle, signature)) {
-            throw new Exception("Unable to create signature");
+        if (0 != (ret = bbs_sign_finish(handle, signature))) {
+            throw new Exception("Unable to create signature: " + ret + " - " + get_last_error());
         }
         return signature;
     }
@@ -254,15 +257,16 @@ public class Bbs {
         if (0 == handle) {
             throw new Exception("Unable to create verify signature context");
         }
-        if (0 != bbs_verify_set_public_key(handle, public_key)) {
-            throw new Exception("Unable to set public key");
+        int ret;
+        if (0 != (ret = bbs_verify_set_public_key(handle, public_key))) {
+            throw new Exception("Unable to set public key: " + ret + " - " + get_last_error());
         }
-        if (0 != bbs_verify_set_signature(handle, signature)) {
-            throw new Exception("Unable to set signature");
+        if (0 != (ret = bbs_verify_set_signature(handle, signature))) {
+            throw new Exception("Unable to set signature: " + ret + " - " + get_last_error());
         }
         for (byte[] msg : messages) {
-            if (0 != bbs_verify_add_message_bytes(handle, msg)) {
-                throw new Exception("Unable to add message");
+            if (0 != (ret = bbs_verify_add_message_bytes(handle, msg))) {
+                throw new Exception("Unable to add message: " + ret + " - " + get_last_error());
             }
         }
         int res = bbs_verify_finish(handle);
@@ -273,25 +277,27 @@ public class Bbs {
             case 1:
                 return false;
             default:
-                throw new Exception("Unable to verify signature");
+                throw new Exception("Unable to verify signature: " + res + " - " + get_last_error());
         }
     }
 
     public static boolean blsVerify(byte[] public_key, byte[] signature, byte[][] messages) throws Exception {
         byte[] bbs_public_key = Bbs.blsPublicToBbsPublicKey(public_key, messages.length);
+        System.out.println("blsVerify: " + new String(bbs_public_key));
         long handle = bbs_verify_init();
         if (0 == handle) {
             throw new Exception("Unable to create verify signature context");
         }
-        if (0 != bbs_verify_set_public_key(handle, bbs_public_key)) {
-            throw new Exception("Unable to set public key");
+        int ret;
+        if (0 != (ret = bbs_verify_set_public_key(handle, bbs_public_key))) {
+            throw new Exception("Unable to set public key: " + ret + " - " + get_last_error());
         }
-        if (0 != bbs_verify_set_signature(handle, signature)) {
-            throw new Exception("Unable to set signature");
+        if (0 != (ret = bbs_verify_set_signature(handle, signature))) {
+            throw new Exception("Unable to set signature: " + ret + " - " + get_last_error());
         }
         for (byte[] msg : messages) {
-            if (0 != bbs_verify_add_message_bytes(handle, msg)) {
-                throw new Exception("Unable to add message");
+            if (0 != (ret = bbs_verify_add_message_bytes(handle, msg))) {
+                throw new Exception("Unable to add message: " + ret + " - " + get_last_error());
             }
         }
         int res = bbs_verify_finish(handle);
@@ -302,7 +308,7 @@ public class Bbs {
             case 1:
                 return false;
             default:
-                throw new Exception("Unable to verify signature");
+                throw new Exception("Unable to verify signature: " + res + " - " + get_last_error());
         }
     }
 

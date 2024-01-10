@@ -131,18 +131,55 @@ macro_rules! add_bytes_impl {
         #[no_mangle]
         pub extern "C" fn $name(handle: u64, value: ByteArray, err: &mut ExternError) -> i32 {
             let value = value.to_vec();
+
+
+            use std::io::{self, Write};
+            println!("NAME: {} {} {} {}", stringify!($name), stringify!($static), stringify!($property), stringify!($type));
+            io::stdout().flush().unwrap();
+
+
             if value.is_empty() {
                 *err = ExternError::new_error(
                     ErrorCode::new(1),
                     &format!("{} cannot be empty", stringify!($type)),
                 );
+
+
+                println!("EMPTY: {}", stringify!(err));
+                io::stdout().flush().unwrap();
+
+
                 return 1;
             }
             $static.call_with_result_mut(err, handle, |ctx| -> Result<(), BbsFfiError> {
+
+
+                println!("CALL: {}", handle);
+                io::stdout().flush().unwrap();
+
+
                 let v = $type::try_from(value)?;
+
+
+                println!("CALL v: {}", "v");
+                io::stdout().flush().unwrap();
+
+
                 ctx.$property = Some(v);
+
+
+                println!("CALL ctx: {}", "ctx");
+                io::stdout().flush().unwrap();
+
+
                 Ok(())
             });
+
+
+            println!("ERR: {} {}", err.get_and_consume_message().unwrap(), err.get_code().code());
+            io::stdout().flush().unwrap();
+
+
             err.get_code().code()
         }
     };

@@ -15,7 +15,7 @@ plugins {
 }
 
 group 'com.github.mattrglobal'
-version '1.6-SNAPSHOT'
+version '2.0'
 
 apply plugin : "java" 
 apply plugin: "maven-publish"
@@ -33,6 +33,11 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    mavenLocal()
+}
+
+test {
+  exclude '**/**'
 }
 
 dependencies {
@@ -104,18 +109,6 @@ task copyMacosNativeDep(type: Copy) {
     into 'build/libs'
 }
 
-/* Test with JUNIT on Macos */
-test {
-    dependsOn copyMacosNativeDep
-    systemProperty "java.library.path", 'build/libs'
-
-    useJUnit()
-
-    maxHeapSize = '1G'
-    
-    // Enable logging output to stderr
-    testLogging.showStandardStreams = true
-}
 
 task runMain(type: JavaExec) {
     systemProperty "java.library.path", 'build/libs'
@@ -146,7 +139,7 @@ signing {
 
 publishing {
     repositories {
-        //mavenLocal()
+        mavenLocal()
         maven {
             name = "Maven"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -165,3 +158,19 @@ publishing {
         }
     }
 }
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+

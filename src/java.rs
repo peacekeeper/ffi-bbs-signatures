@@ -301,9 +301,22 @@ pub extern "C" fn Java_bbs_signatures_Bbs_bbs_1sign_1set_1secret_1key(
     handle: jlong,
     secret_key: jbyteArray,
 ) -> jint {
+
+
+    use std::io::{self, Write};
+    println!("JAVA SECRET: {}", "Java_bbs_signatures_Bbs_bbs_1sign_1set_1secret_1key");
+    io::stdout().flush().unwrap();
+
+
     match env.convert_byte_array(secret_key) {
         Err(_) => 1,
         Ok(s) => {
+
+
+            println!("JAVA SECRET ok: {}", "ok");
+            io::stdout().flush().unwrap();
+
+
             if s.len() != FR_COMPRESSED_SIZE {
                 2
             } else {
@@ -323,16 +336,47 @@ pub extern "C" fn Java_bbs_signatures_Bbs_bbs_1sign_1set_1public_1key(
     handle: jlong,
     public_key: jbyteArray,
 ) -> jint {
+
+
+    use std::io::{self, Write};
+    println!("JAVA PUBLIC: {}", "Java_bbs_signatures_Bbs_bbs_1sign_1set_1public_1key");
+    io::stdout().flush().unwrap();
+
+
     match env.convert_byte_array(public_key) {
         Err(_) => 1,
         Ok(s) => {
+
+
+            println!("JAVA PUBLIC ok: {}", "ok");
+            io::stdout().flush().unwrap();
+
+
             let mut err = ExternError::success();
             SIGN_CONTEXT.call_with_result_mut(&mut err, handle as u64, |ctx| -> Result<(), BbsFfiError> {
                 use std::convert::TryFrom;
+
+
+                println!("JAVA PUBLIC call: {}", "err");
+                io::stdout().flush().unwrap();
+
+
                 let v = PublicKey::try_from(s)?;
+
+
+                println!("JAVA PUBLIC v: {}", v);
+                io::stdout().flush().unwrap();
+
+
                 ctx.public_key = Some(v);
                 Ok(())
             });
+
+
+            println!("JAVA PUBLIC ERR: {}", err.get_code().code());
+            io::stdout().flush().unwrap();
+
+
             err.get_code().code()
         }
     }
